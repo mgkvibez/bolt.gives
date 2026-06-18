@@ -1,0 +1,148 @@
+@use 'variables.scss';
+@use 'z-index.scss';
+@use 'animations.scss';
+@use 'components/terminal.scss';
+@use 'components/resize-handle.scss';
+@use 'components/code.scss';
+@use 'components/editor.scss';
+@use 'components/toast.scss';
+
+html,
+body {
+  height: 100%;
+  width: 100%;
+  background-color: var(--bolt-elements-bg-depth-1);
+}
+
+body {
+  position: relative;
+  overflow: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(42rem circle at 8% 12%, color-mix(in srgb, var(--bolt-gradient-red), transparent 88%), transparent 68%),
+    radial-gradient(40rem circle at 88% 10%, color-mix(in srgb, var(--bolt-gradient-blue), transparent 90%), transparent 72%);
+  opacity: 0.85;
+  z-index: 0;
+}
+
+#root {
+  position: relative;
+  z-index: 1;
+}
+
+.bolt-cursor-glow {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 30rem;
+  height: 30rem;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate3d(-9999px, -9999px, 0);
+  transition: opacity 220ms ease-out;
+  border-radius: 9999px;
+  background:
+    radial-gradient(circle, color-mix(in srgb, var(--bolt-gradient-blue), transparent 74%) 0%, transparent 58%),
+    radial-gradient(circle at 62% 38%, color-mix(in srgb, var(--bolt-gradient-red), transparent 76%) 0%, transparent 62%);
+  filter: blur(16px);
+  mix-blend-mode: screen;
+  z-index: 0;
+}
+
+:root[data-theme='light'] .bolt-cursor-glow {
+  opacity: var(--bolt-cursor-glow-opacity, 0.48);
+  mix-blend-mode: normal;
+}
+
+:root[data-theme='dark'] .bolt-cursor-glow {
+  opacity: var(--bolt-cursor-glow-opacity, 0.32);
+  mix-blend-mode: screen;
+}
+
+@media (pointer: coarse), (prefers-reduced-motion: reduce) {
+  .bolt-cursor-glow {
+    display: none;
+  }
+}
+
+:root {
+  --gradient-opacity: 0.8;
+  --primary-color: rgba(239, 68, 68, var(--gradient-opacity));
+  --secondary-color: rgba(220, 38, 38, var(--gradient-opacity));
+  --accent-color: rgba(59, 130, 246, var(--gradient-opacity));
+  // --primary-color: rgba(239, 68, 68, var(--gradient-opacity));
+  // --secondary-color: rgba(168, 85, 247, var(--gradient-opacity));
+  // --accent-color: rgba(59, 130, 246, var(--gradient-opacity));
+}
+
+/* Crimson-Azure Gradient Theme Classes */
+.bg-gradient-crimson-azure {
+  background: linear-gradient(135deg, var(--bolt-gradient-crimson) 0%, var(--bolt-bg-gradient-mid) 50%, var(--bolt-gradient-azure) 100%);
+}
+
+.text-gradient-crimson-azure {
+  background: linear-gradient(135deg, var(--bolt-gradient-red) 0%, var(--bolt-gradient-blue) 50%, var(--bolt-gradient-azure) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.gradient-border-crimson-azure {
+  border: 2px solid transparent;
+  background: linear-gradient(var(--bolt-elements-bg-depth-1), var(--bolt-elements-bg-depth-1)) padding-box,
+              linear-gradient(135deg, var(--bolt-gradient-red), var(--bolt-gradient-blue), var(--bolt-gradient-azure)) border-box;
+}
+
+.modern-scrollbar {
+  overflow: auto;
+
+  // WebKit scrollbar styling
+  &::-webkit-scrollbar {
+    width: 2px;
+    height: 4px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    // Use CSS variables for colors
+    background-color: var(--modern-scrollbar-thumb-background);
+    border-radius: 9999px; // pill shape
+    border: 2px solid transparent; // for padding-like effect
+    background-clip: content-box;
+    transition: background-color 0.2s ease-in-out; // Add transition
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    // Use CSS variable for hover color
+    background-color: var(--modern-scrollbar-thumb-backgroundHover);
+  }
+
+  // Firefox support
+  scrollbar-width: thin;
+  // Use CSS variables for Firefox colors
+  scrollbar-color: var(--modern-scrollbar-thumb-backgroundHover) transparent; // Use hover color for thumb for consistency
+}
+
+.modern-scrollbar-invert {
+  &::-webkit-scrollbar-thumb {
+    // Override with a contrasting color, e.g., primary text color with transparency
+    background-color: color-mix(in srgb, var(--bolt-elements-textPrimary), transparent 70%);
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    // Darker/more opaque version on hover
+    background-color: color-mix(in srgb, var(--bolt-elements-textPrimary), transparent 50%);
+  }
+
+  // Firefox support for inverted colors
+  scrollbar-color: color-mix(in srgb, var(--bolt-elements-textPrimary), transparent 50%) transparent;
+}

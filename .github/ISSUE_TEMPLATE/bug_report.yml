@@ -1,0 +1,102 @@
+name: '🐛 Bug Report'
+description: Create a structured report to help us improve bolt.gives
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ### Thank you for reporting an issue! 🙏
+        This issue tracker is specifically for bugs found within [bolt.gives](https://bolt.gives).
+        
+        **Important:** If your issue is related to the underlying WebContainer technology, please file it in the [official StackBlitz repo](https://github.com/stackblitz/webcontainer-core).
+
+  - type: textarea
+    id: description
+    attributes:
+      label: ⚡ Describe the bug
+      description: A clear and concise description of the error or unexpected behavior.
+      placeholder: e.g., The agent gets stuck in a loop when trying to install 'lucide-react'...
+    validations:
+      required: true
+
+  - type: dropdown
+    id: phase
+    attributes:
+      label: 🔄 Agent Phase
+      description: At what point in the "Agentic Coding" workflow did the failure occur?
+      options:
+        - Planning (Thinking about the task)
+        - Doing (Writing code / Running commands)
+        - Verifying (Testing the output / Linting)
+        - Next Steps (Recommending follow-ups)
+        - UI/General (Not related to the agent)
+    validations:
+      required: true
+
+  - type: input
+    id: link
+    attributes:
+      label: 🔗 Bolt URL
+      description: Provide the URL of the Bolt project where this occurred. (Please do not delete the project!)
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: 📑 Steps to reproduce
+      description: How can we make this happen again?
+      placeholder: |
+        1. Open bolt.gives
+        2. Prompt for '...'
+        3. Click the '...' button
+        4. See error in terminal/console
+    validations:
+      required: true
+
+  - type: input
+    id: provider_model
+    attributes:
+      label: 🤖 AI Provider & Model
+      description: e.g., Anthropic (Claude 3.5 Sonnet) or Ollama (Qwen2.5-Coder)
+      placeholder: Anthropic / Claude 3.5 Sonnet
+    validations:
+      required: true
+
+  - type: textarea
+    id: platform
+    attributes:
+      label: 💻 Platform & Environment
+      value: |
+        - **Browser:** [e.g. Chrome, Brave, Safari]
+        - **Client OS:** [e.g. macOS Sonoma, Windows 11]
+        - **Self-Hosted?** [Yes/No]
+        - **Node Version (if self-hosted):** [e.g. v20.x]
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: 📂 Terminal / Console Logs
+      description: Please paste any relevant error logs or the "Agent Commentary" stream here.
+      render: shell
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: 🖼️ Screen Recording / Screenshot
+      description: Drag and drop your media here. Recordings are highly preferred for agent loops!
+
+  - type: checkboxes
+    id: privacy
+    attributes:
+      label: 🔒 Privacy Check
+      options:
+        - label: I have scrubbed all API Keys, Secrets, and sensitive paths from my logs.
+          required: true
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: 📝 Additional context
+      description: Anything else we should know?

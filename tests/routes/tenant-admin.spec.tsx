@@ -1,0 +1,259 @@
+// @vitest-environment jsdom
+
+import { cleanup, render, screen } from '@testing-library/react';
+import type { FormHTMLAttributes } from 'react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+const remixMocks = vi.hoisted(() => ({
+  useLoaderData: vi.fn(),
+  useActionData: vi.fn(),
+  formProps: [] as Array<Record<string, unknown>>,
+}));
+
+vi.mock('@remix-run/react', () => ({
+  Form: ({
+    children,
+    reloadDocument,
+    ...props
+  }: FormHTMLAttributes<HTMLFormElement> & { reloadDocument?: boolean }) => {
+    remixMocks.formProps.push({ ...props, reloadDocument });
+    return <form {...props}>{children}</form>;
+  },
+  useLoaderData: remixMocks.useLoaderData,
+  useActionData: remixMocks.useActionData,
+}));
+
+vi.mock('~/components/header/Header', () => ({
+  Header: () => <div data-testid="header" />,
+}));
+
+vi.mock('~/components/ui/BackgroundRays', () => ({
+  default: () => <div data-testid="background-rays" />,
+}));
+
+let TenantAdminPage: (typeof import('../../app/routes/tenant-admin'))['default'];
+
+describe('TenantAdminPage', () => {
+  beforeEach(async () => {
+    (window as any).__vite_plugin_react_preamble_installed__ = true;
+    remixMocks.useActionData.mockReturnValue(undefined);
+    remixMocks.formProps.length = 0;
+    remixMocks.useLoaderData.mockReturnValue({
+      adminHost: true,
+      supported: true,
+      authenticated: true,
+      adminPanelUrl: 'https://admin.bolt.gives',
+      defaultAdmin: {
+        username: 'admin',
+      },
+      admin: {
+        username: 'admin',
+        mustChangePassword: false,
+        updatedAt: '2026-04-04T12:00:00.000Z',
+        passwordUpdatedAt: '2026-04-04T12:00:00.000Z',
+        lastLoginAt: '2026-04-04T12:05:00.000Z',
+      },
+      tenants: [],
+      clientProfiles: [
+        {
+          id: 'profile-1',
+          name: 'Owner Example',
+          email: 'owner@example.com',
+          company: 'OpenWeb',
+          role: 'Founder',
+          phone: null,
+          country: 'South Africa',
+          useCase: 'Clinic scheduler',
+          requestedSubdomain: 'clinic-trial',
+          registrationSource: 'managed-instance:alpha1.bolt.gives',
+          createdAt: '2026-04-04T11:00:00.000Z',
+          updatedAt: '2026-04-04T11:00:00.000Z',
+          lastInstanceSlug: 'clinic-trial',
+          lastInstanceStatus: 'active',
+          lastInstanceUrl: 'https://clinic-trial.pages.dev',
+        },
+      ],
+      filteredClientProfiles: [
+        {
+          id: 'profile-1',
+          name: 'Owner Example',
+          email: 'owner@example.com',
+          company: 'OpenWeb',
+          role: 'Founder',
+          phone: null,
+          country: 'South Africa',
+          useCase: 'Clinic scheduler',
+          requestedSubdomain: 'clinic-trial',
+          registrationSource: 'managed-instance:alpha1.bolt.gives',
+          createdAt: '2026-04-04T11:00:00.000Z',
+          updatedAt: '2026-04-04T11:00:00.000Z',
+          lastInstanceSlug: 'clinic-trial',
+          lastInstanceStatus: 'active',
+          lastInstanceUrl: 'https://clinic-trial.pages.dev',
+        },
+      ],
+      clientProfileFilters: {
+        search: '',
+        company: '',
+        country: '',
+        useCase: '',
+        assignmentStatus: 'all',
+      },
+      clientProfileCompanies: ['OpenWeb'],
+      clientProfileCountries: ['South Africa'],
+      clientProfileAudienceLabel: 'all registered clients · 1 recipients',
+      emailMessages: [],
+      bugReports: [
+        {
+          id: 'bug-1',
+          fullName: 'Ada Operator',
+          reporterEmail: 'ada@example.com',
+          summary: 'Preview stalled after install',
+          issue: 'The workspace never moved beyond install after a dependency change.',
+          pageUrl: 'https://alpha1.bolt.gives',
+          appVersion: '3.0.9.3',
+          provider: 'FREE',
+          model: 'deepseek/deepseek-v4-pro',
+          browser: 'Firefox',
+          userAgent: 'Mozilla/5.0',
+          status: 'new',
+          notificationStatus: 'sent',
+          notificationTransport: 'SMTP smtp.example.com:587',
+          notificationError: null,
+          createdAt: '2026-04-04T12:15:00.000Z',
+          notifiedAt: '2026-04-04T12:15:30.000Z',
+        },
+      ],
+      mailSupport: {
+        configured: false,
+        host: null,
+        port: 587,
+        secure: false,
+        user: null,
+        hasPassword: false,
+        fromAddress: null,
+        transportLabel: null,
+        reason: 'SMTP is not configured on the runtime service yet.',
+      },
+      managedSupport: {
+        supported: true,
+        reason: null,
+        trialDays: 0,
+        rootDomain: 'pages.dev',
+        sourceBranch: 'main',
+      },
+      managedInstances: [
+        {
+          id: 'instance-1',
+          name: 'Clinic Trial',
+          email: 'owner@example.com',
+          projectName: 'clinic-trial',
+          routeHostname: 'clinic-trial.pages.dev',
+          pagesUrl: 'https://clinic-trial.pages.dev',
+          plan: 'experimental-free-indefinite',
+          status: 'active',
+          createdAt: '2026-04-04T12:00:00.000Z',
+          updatedAt: '2026-04-04T12:10:00.000Z',
+          trialEndsAt: null,
+          currentGitSha: 'abc1234',
+          previousGitSha: null,
+          lastRolloutAt: '2026-04-04T12:10:00.000Z',
+          lastDeploymentUrl: 'https://clinic-trial.pages.dev',
+          lastError: null,
+          suspendedAt: null,
+          expiredAt: null,
+          sourceBranch: 'main',
+        },
+      ],
+      auditTrail: [],
+    });
+    TenantAdminPage = (await import('../../app/routes/tenant-admin')).default;
+  });
+
+  afterEach(() => {
+    cleanup();
+    vi.clearAllMocks();
+  });
+
+  it('renders the managed trial operator section with admin actions', () => {
+    render(<TenantAdminPage />);
+
+    expect(screen.getByText('Admin Panel')).toBeTruthy();
+    expect(screen.getByText('Operator console')).toBeTruthy();
+    expect(screen.getByRole('link', { name: /Overview/i })).toBeTruthy();
+    expect(screen.getByRole('link', { name: /Managed Instances/i })).toBeTruthy();
+    expect(screen.getAllByText('Client Profiles').length).toBeGreaterThan(0);
+    expect(screen.getByText('Owner Example')).toBeTruthy();
+    expect(screen.getByText('Managed Cloudflare Instances')).toBeTruthy();
+    expect(screen.getByText('SMTP Configuration')).toBeTruthy();
+    expect(screen.getByText('Clinic Trial')).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Save draft' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Save SMTP settings' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Refresh deployment' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Suspend instance' })).toBeTruthy();
+    expect(screen.getByText('Recent Bug Reports')).toBeTruthy();
+    expect(screen.getByText('Preview stalled after install')).toBeTruthy();
+    expect(screen.queryByText(/CLOUDFLARE_API_TOKEN/i)).toBeNull();
+    expect(screen.queryByText('admin / admin')).toBeNull();
+  });
+
+  it('forces full document auth submits so cookie-backed redirects stay outside the SPA', () => {
+    remixMocks.formProps.length = 0;
+    remixMocks.useLoaderData.mockReturnValue({
+      adminHost: true,
+      supported: true,
+      authenticated: false,
+      adminPanelUrl: 'https://admin.bolt.gives',
+      defaultAdmin: {
+        username: 'admin',
+      },
+      admin: {
+        username: 'admin',
+        mustChangePassword: true,
+        updatedAt: '2026-04-04T12:00:00.000Z',
+        passwordUpdatedAt: '2026-04-04T12:00:00.000Z',
+        lastLoginAt: null,
+      },
+      tenants: [],
+      clientProfiles: [],
+      filteredClientProfiles: [],
+      clientProfileFilters: {
+        search: '',
+        company: '',
+        country: '',
+        useCase: '',
+        assignmentStatus: 'all',
+      },
+      clientProfileCompanies: [],
+      clientProfileCountries: [],
+      clientProfileAudienceLabel: 'all registered clients · 0 recipients',
+      emailMessages: [],
+      bugReports: [],
+      mailSupport: {
+        configured: false,
+        host: null,
+        port: 587,
+        secure: false,
+        user: null,
+        hasPassword: false,
+        fromAddress: null,
+        transportLabel: null,
+        reason: 'SMTP is not configured on the runtime service yet.',
+      },
+      managedSupport: {
+        supported: true,
+        reason: null,
+        trialDays: 0,
+        rootDomain: 'pages.dev',
+        sourceBranch: 'main',
+      },
+      managedInstances: [],
+      auditTrail: [],
+    });
+
+    render(<TenantAdminPage />);
+
+    const loginFormProps = remixMocks.formProps.find((props) => props.method === 'post');
+    expect(loginFormProps?.reloadDocument).toBe(true);
+  });
+});
